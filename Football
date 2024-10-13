@@ -1,0 +1,35 @@
+local workspaceService = game:GetService("Workspace")
+local runService = game:GetService("RunService")
+
+local function createHitbox(part)
+    local hitbox = Instance.new("Part")
+    hitbox.Size = part.Size * 1.2
+    hitbox.CFrame = part.CFrame
+    hitbox.Transparency = 0
+    hitbox.Color = Color3.new(0, 1, 0)
+    hitbox.CanCollide = false
+    hitbox.Anchored = true
+    hitbox.Parent = workspaceService
+
+    local conn
+    conn = runService.RenderStepped:Connect(function()
+        if part and part.Parent then
+            hitbox.CFrame = part.CFrame
+        else
+            hitbox:Destroy()
+            conn:Disconnect()
+        end
+    end)
+end
+
+local function onChildAdded(newChild)
+    if newChild:IsA("BasePart") and newChild.Name == "Football" then
+        newChild.Size = Vector3.new(25, 25, 25) -- Set dimensions to 25x25x25
+        newChild.CanCollide = false -- Disable collisions for the resized football
+        newChild.Massless = true -- Set massless to ensure the ball is lightweight
+        
+        createHitbox(newChild)
+    end
+end
+
+workspaceService.ChildAdded:Connect(onChildAdded)
